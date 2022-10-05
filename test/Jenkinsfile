@@ -4,20 +4,22 @@ pipeline
     tools {
         maven 'maven'
     }
-    stages
-    {
-        stage('Build')
+    stages {
+        stage('Build'){
             steps
             {
             git 'https://github.com/simpleit/test-jenkins-integration/ '
             sh "mvn -Dmaven . test . failure . ignore = true clean package"
             }
-    }
-    success
-    junit '** / target / surefire - reports / TEST - * . xml '
-    archiveArtifacts ' target / * . jar '
-        stage("Deploy to QA") {
-            steps {
+            post{
+                success{
+                    junit '**/target/surefire-reports/TEST-*.xml'
+                    archiveArtifacts 'target/*.jar'
+                }
+            }
+        }    
+        stage("Deploy to QA"){
+            steps{
                 echo("deploy to qa")
             }
         }
@@ -42,5 +44,6 @@ pipeline
                             reportTitles : ''])
             }
         }
+    }
 
 }
